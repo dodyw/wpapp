@@ -1,0 +1,9 @@
+WPAPP WordPress Plugin
+======================
+
+Credit:
+
+1) This plugin is based from JSON-API (http://wordpress.org/extend/plugins/json-api/)
+2) Modified and added more functions by Dody Rachmat W. (info@dodyrw.com) with the purpose to serve as secure data provider for WpApp WordPress mobile app.
+
+This plugin is released under GPL license.
