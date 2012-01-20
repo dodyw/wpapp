@@ -3,7 +3,7 @@
 Plugin Name: WPAPP
 Plugin URI: http://github.com/dodyrw/wpapp
 Description: Secure data provider for WpApp WordPress mobile app.
-Version: 1.0.0
+Version: 1.2
 Author: Dody Rachmat W.
 Author URI: http://www.dodyrw.com/
 */
