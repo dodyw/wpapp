@@ -28,7 +28,7 @@ function wpapp_init() {
   $wpapp_options = get_option('wpapp_options');
 
   if ($_GET['json']) {
-    if ($_GET['json']=='get_recent_posts' || $_GET['json']=='get_category_posts') {
+    if ($_GET['json']=='get_recent_posts' || $_GET['json']=='get_category_posts' || $_GET['json']=='get_page' || $_GET['json']=='get_category_index') {
       if ($_GET['apikey']!=$wpapp_options[wpapp_api_key]) {
         print "[error:99] Permission denied!";
         exit;
