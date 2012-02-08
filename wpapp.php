@@ -3,7 +3,7 @@
 Plugin Name: WPAPP
 Plugin URI: http://github.com/dodyrw/wpapp
 Description: Secure data provider for WpApp WordPress mobile app.
-Version: 1.2
+Version: 2.0.0
 Author: Dody Rachmat W.
 Author URI: http://www.dodyrw.com/
 */
@@ -28,7 +28,7 @@ function wpapp_init() {
   $wpapp_options = get_option('wpapp_options');
 
   if ($_GET['json']) {
-    if ($_GET['json']=='get_recent_posts' || $_GET['json']=='get_category_posts' || $_GET['json']=='get_page' || $_GET['json']=='get_category_index') {
+    if ($_GET['json']=='get_recent_posts' || $_GET['json']=='get_category_posts' || $_GET['json']=='get_page' || $_GET['json']=='get_category_index' || $_GET['json']=='get_search_results') {
       if ($_GET['apikey']!=$wpapp_options[wpapp_api_key]) {
         print "[error:99] Permission denied!";
         exit;
@@ -111,12 +111,62 @@ function wpapp_options_page() {
   add_options_page('WpApp','WpApp','administrator',__FILE__, 'wpapp_options_page2');
 }
 
-// add_action('admin_menu', 'wpapp_options_page');
+function wpapp_pushme($post_ID, $isedit = false) {
+  $post = get_post($post_ID);
+  $post_url = get_permalink($post_ID);
+  $post_title = strip_tags($post->post_title);
 
+  $wpapp_options = get_option('wpapp_options');
+
+  define('APPKEY', $wpapp_options[wpapp_urbanairship_app_key]); 
+  define('PUSHSECRET', $wpapp_options[wpapp_urbanairship_master_secret]); // Master Secret
+  define('PUSHURL', 'https://go.urbanairship.com/api/push/broadcast/'); 
+
+  $contents = array(); 
+  $contents['badge'] = "+1"; 
+  $contents['alert'] = $post_title; 
+  $contents['sound'] = "cow"; 
+  $push = array("aps" => $contents); 
+
+  $json = json_encode($push); 
+
+  $session = curl_init(PUSHURL); 
+  curl_setopt($session, CURLOPT_USERPWD, APPKEY . ':' . PUSHSECRET); 
+  curl_setopt($session, CURLOPT_POST, True); 
+  curl_setopt($session, CURLOPT_POSTFIELDS, $json); 
+  curl_setopt($session, CURLOPT_HEADER, False); 
+  curl_setopt($session, CURLOPT_RETURNTRANSFER, True); 
+  curl_setopt($session, CURLOPT_HTTPHEADER, array('Content-Type:application/json')); 
+  $content = curl_exec($session); 
+//  echo $content; // just for testing what was sent
+
+
+  // Check if any error occured 
+  $response = curl_getinfo($session); 
+
+  if($response['http_code'] != 200) { 
+//    echo "Got negative response from server, http code: ". 
+    $response['http_code'] . "\n"; 
+  } 
+  else { 
+//    echo "Wow, it worked!\n"; 
+  } 
+
+  curl_close($session);
+}
+
+add_action('future_to_publish', 'wpapp_pushme', 10, 2);
+add_action('new_to_publish', 'wpapp_pushme', 10, 2);
+add_action('draft_to_publish', 'wpapp_pushme', 10, 2);
+add_action('pending_to_publish', 'wpapp_pushme', 10, 2);
+
+// add_action('admin_menu', 'wpapp_options_page');
 // Add initialization and activation hooks
 // add_action('admin_menu', 'WPAPP::add_menu');
 add_action('init', 'wpapp_init');
 register_activation_hook("$dir/wpapp.php", 'wpapp_activation');
 register_deactivation_hook("$dir/wpapp.php", 'wpapp_deactivation');
+
+
 
 ?>

@@ -96,6 +96,8 @@ class WPAPP {
     register_setting('wpapp_options', 'wpapp_options');
     add_settings_section('wpapp_main_section','Main Setting',array($this, 'wpapp_main_section_cb'),__FILE__);
     add_settings_field('wpapp_api_key','API KEY:',array($this, 'wpapp_api_key_setting'),__FILE__,'wpapp_main_section');
+    add_settings_field('wpapp_urbanairship_app_key','Urban Airship App Key:',array($this, 'wpapp_urbanairship_app_key_setting'),__FILE__,'wpapp_main_section');
+    add_settings_field('wpapp_urbanairship_master_secret','Urban Airship Master Secret:',array($this, 'wpapp_urbanairship_master_secret_setting'),__FILE__,'wpapp_main_section');
   }
 
   function wpapp_main_section_cb() {
@@ -103,7 +105,15 @@ class WPAPP {
   }
 
   function wpapp_api_key_setting() {
-    print "<input type='text' name='wpapp_options[wpapp_api_key]' value='{$this->options[wpapp_api_key]}' />";
+    print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_api_key]' value='{$this->options[wpapp_api_key]}' />";
+  }
+
+  function wpapp_urbanairship_app_key_setting() {
+    print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_urbanairship_app_key]' value='{$this->options[wpapp_urbanairship_app_key]}' />";
+  }
+
+  function wpapp_urbanairship_master_secret_setting() {
+    print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_urbanairship_master_secret]' value='{$this->options[wpapp_urbanairship_master_secret]}' />";
   }
   
   ////////////////
