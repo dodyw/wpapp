@@ -3,7 +3,7 @@
 Plugin Name: WPAPP
 Plugin URI: http://github.com/dodyrw/wpapp
 Description: Secure data provider for WpApp WordPress mobile app.
-Version: 2.0.0
+Version: 3.0.0
 Author: Dody Rachmat W.
 Author URI: http://www.dodyrw.com/
 */
@@ -118,41 +118,53 @@ function wpapp_pushme($post_ID, $isedit = false) {
 
   $wpapp_options = get_option('wpapp_options');
 
-  define('APPKEY', $wpapp_options[wpapp_urbanairship_app_key]); 
-  define('PUSHSECRET', $wpapp_options[wpapp_urbanairship_master_secret]); // Master Secret
-  define('PUSHURL', 'https://go.urbanairship.com/api/push/broadcast/'); 
+  // use DDAPNS
 
-  $contents = array(); 
-  $contents['badge'] = "+1"; 
-  $contents['alert'] = $post_title; 
-  $contents['sound'] = "cow"; 
-  $push = array("aps" => $contents); 
+  if ($wpapp_options[wpapp_ddapns_url]) { 
+    $url = $wpapp_options[wpapp_ddapns_url].'push.php?key='.$wpapp_options[wpapp_ddapns_access_key].
+          '&msg='.urlencode(strip_tags($post->post_title));
 
-  $json = json_encode($push); 
+    $session = curl_init($url); 
+    curl_setopt($session, CURLOPT_RETURNTRANSFER, True); 
+    $content = curl_exec($session);
+  }
+  else {
 
-  $session = curl_init(PUSHURL); 
-  curl_setopt($session, CURLOPT_USERPWD, APPKEY . ':' . PUSHSECRET); 
-  curl_setopt($session, CURLOPT_POST, True); 
-  curl_setopt($session, CURLOPT_POSTFIELDS, $json); 
-  curl_setopt($session, CURLOPT_HEADER, False); 
-  curl_setopt($session, CURLOPT_RETURNTRANSFER, True); 
-  curl_setopt($session, CURLOPT_HTTPHEADER, array('Content-Type:application/json')); 
-  $content = curl_exec($session); 
-//  echo $content; // just for testing what was sent
+    // use URBAN AIRSHIP
+
+    define('APPKEY', $wpapp_options[wpapp_urbanairship_app_key]); 
+    define('PUSHSECRET', $wpapp_options[wpapp_urbanairship_master_secret]); // Master Secret
+    define('PUSHURL', 'https://go.urbanairship.com/api/push/broadcast/'); 
+
+    $contents = array(); 
+    $contents['badge'] = "+1"; 
+    $contents['alert'] = $post_title; 
+    $contents['sound'] = "cow"; 
+    $push = array("aps" => $contents); 
+
+    $json = json_encode($push); 
+
+    $session = curl_init(PUSHURL); 
+    curl_setopt($session, CURLOPT_USERPWD, APPKEY . ':' . PUSHSECRET); 
+    curl_setopt($session, CURLOPT_POST, True); 
+    curl_setopt($session, CURLOPT_POSTFIELDS, $json); 
+    curl_setopt($session, CURLOPT_HEADER, False); 
+    curl_setopt($session, CURLOPT_RETURNTRANSFER, True); 
+    curl_setopt($session, CURLOPT_HTTPHEADER, array('Content-Type:application/json')); 
+    $content = curl_exec($session); 
+
+    $response = curl_getinfo($session); 
+
+    if($response['http_code'] != 200) { 
+      $response['http_code'] . "\n"; 
+    } 
+    else { 
+    } 
+
+    curl_close($session);
+  }
 
 
-  // Check if any error occured 
-  $response = curl_getinfo($session); 
-
-  if($response['http_code'] != 200) { 
-//    echo "Got negative response from server, http code: ". 
-    $response['http_code'] . "\n"; 
-  } 
-  else { 
-//    echo "Wow, it worked!\n"; 
-  } 
-
-  curl_close($session);
 }
 
 add_action('future_to_publish', 'wpapp_pushme', 10, 2);

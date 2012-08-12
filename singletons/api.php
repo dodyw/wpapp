@@ -98,6 +98,8 @@ class WPAPP {
     add_settings_field('wpapp_api_key','API KEY:',array($this, 'wpapp_api_key_setting'),__FILE__,'wpapp_main_section');
     add_settings_field('wpapp_urbanairship_app_key','Urban Airship App Key:',array($this, 'wpapp_urbanairship_app_key_setting'),__FILE__,'wpapp_main_section');
     add_settings_field('wpapp_urbanairship_master_secret','Urban Airship Master Secret:',array($this, 'wpapp_urbanairship_master_secret_setting'),__FILE__,'wpapp_main_section');
+    add_settings_field('wpapp_ddapns_access_key','DDAPNS Access Key:',array($this, 'wpapp_ddapns_access_key_setting'),__FILE__,'wpapp_main_section');
+    add_settings_field('wpapp_ddapns_url','DDAPNS Url:',array($this, 'wpapp_ddapns_url_setting'),__FILE__,'wpapp_main_section');
   }
 
   function wpapp_main_section_cb() {
@@ -114,6 +116,14 @@ class WPAPP {
 
   function wpapp_urbanairship_master_secret_setting() {
     print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_urbanairship_master_secret]' value='{$this->options[wpapp_urbanairship_master_secret]}' />";
+  }
+
+  function wpapp_ddapns_access_key_setting() {
+    print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_ddapns_access_key]' value='{$this->options[wpapp_ddapns_access_key]}' />";
+  }
+
+  function wpapp_ddapns_url_setting() {
+    print "<input class='regular-text code' type='text' name='wpapp_options[wpapp_ddapns_url]' value='{$this->options[wpapp_ddapns_url]}' /> (ends with slash)";
   }
   
   ////////////////
